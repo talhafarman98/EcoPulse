@@ -1,86 +1,101 @@
 (function() {
 
-    // Badge data
-    const badgeList = [
-        { num: 1, name: "Starter Planter", color: "#4CAF50", icon: "fa-seedling" },
-        { num: 2, name: "Eco Hero", color: "#2196F3", icon: "fa-globe" },
-        { num: 3, name: "Forest Guardian", color: "#8BC34A", icon: "fa-tree" },
-        { num: 4, name: "Climate Warrior", color: "#FF5722", icon: "fa-fire" },
-        { num: 5, name: "Species Saver", color: "#9C27B0", icon: "fa-dove" },
-        { num: 6, name: "Water Protector", color: "#00BCD4", icon: "fa-tint" },
-        { num: 7, name: "Recycling Champ", color: "#009688", icon: "fa-recycle" },
-        { num: 8, name: "Clean Energy Advocate", color: "#FFC107", icon: "fa-solar-panel" }
-    ];
+    // badges.js
 
-    // Inject CSS
-    const style = document.createElement('style');
+// Badge data
+const badgeList = [
+    { id: 1, name: "Starter Planter", color: "#4CAF50", icon: "🌱" },
+    { id: 2, name: "Eco Hero", color: "#2196F3", icon: "🌍" },
+    { id: 3, name: "Forest Guardian", color: "#8BC34A", icon: "🌲" },
+    { id: 4, name: "Climate Warrior", color: "#FF5722", icon: "🔥" },
+    { id: 5, name: "Species Saver", color: "#9C27B0", icon: "🕊️" },
+    { id: 6, name: "Water Protector", color: "#03A9F4", icon: "💧" },
+    { id: 7, name: "Recycling Champ", color: "#009688", icon: "♻️" },
+    { id: 8, name: "Clean Energy Advocate", color: "#FFC107", icon: "🔆" },
+    { id: 9, name: "Ocean Defender", color: "#00BCD4", icon: "🌊" },
+    { id: 10, name: "Green Architect", color: "#4CAF50", icon: "🏛️" },
+    { id: 11, name: "Pollinator Protector", color: "#FFEB3B", icon: "🐝" },
+    { id: 12, name: "Soil Saver", color: "#8D6E63", icon: "🌾" },
+    { id: 13, name: "Wildlife Guardian", color: "#FF9800", icon: "🦌" },
+    { id: 14, name: "Zero Waste Hero", color: "#607D8B", icon: "🗑️" },
+    { id: 15, name: "Tree Ambassador", color: "#2E7D32", icon: "🌳" },
+    { id: 16, name: "Renewable Ranger", color: "#FFB300", icon: "⚡" },
+    { id: 17, name: "River Restorer", color: "#03A9F4", icon: "🏞️" },
+    { id: 18, name: "Compost Champion", color: "#6D4C41", icon: "🍂" }
+];
+
+// Function to render badges
+function renderBadges(containerId, earnedIds) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    // Inject CSS styles
+    const style = document.createElement("style");
     style.innerHTML = `
-        .badge-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        .badge-container {
+            display: flex;
+            flex-wrap: wrap;
             gap: 20px;
+            padding: 10px;
         }
         .badge-card {
             background: white;
-            border-radius: 15px;
-            box-shadow: 0px 4px 20px rgba(0,0,0,0.1);
-            text-align: center;
+            width: 150px;
             padding: 20px;
-            transition: transform 0.2s ease;
-        }
-        .badge-card:hover {
-            transform: translateY(-5px);
+            border-radius: 15px;
+            box-shadow: 0px 4px 12px rgba(0,0,0,0.1);
+            text-align: center;
+            font-family: Arial, sans-serif;
+            position: relative;
         }
         .badge-icon {
             width: 60px;
             height: 60px;
+            background-color: var(--badge-color);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
             font-size: 28px;
-            margin: auto;
-            margin-bottom: 15px;
+            margin: 0 auto 10px auto;
+            color: white;
         }
         .badge-name {
-            font-size: 16px;
-            font-weight: 600;
+            font-size: 14px;
+            font-weight: bold;
             margin-bottom: 8px;
         }
-        .badge-status {
-            font-size: 12px;
-            font-weight: 600;
+        .badge-earned {
             color: #4CAF50;
-            background: #E6F5EC;
-            padding: 4px 10px;
-            border-radius: 20px;
+            font-size: 12px;
+            background: #E8F5E9;
             display: inline-block;
+            padding: 3px 8px;
+            border-radius: 10px;
         }
     `;
     document.head.appendChild(style);
 
-    // Render function
-    window.renderBadges = function(targetSelector, badgeNumbers) {
-        const container = document.querySelector(targetSelector);
-        if (!container) return;
-        container.innerHTML = "";
-        container.classList.add("badge-grid");
+    // Create container div
+    const badgeContainer = document.createElement("div");
+    badgeContainer.className = "badge-container";
 
-        badgeList
-            .filter(b => badgeNumbers.includes(b.num))
-            .forEach(badge => {
-                const badgeDiv = document.createElement("div");
-                badgeDiv.className = "badge-card";
-                badgeDiv.innerHTML = `
-                    <div class="badge-icon" style="background:${badge.color}">
-                        <i class="fas ${badge.icon}"></i>
-                    </div>
-                    <div class="badge-name">${badge.name}</div>
-                    <div class="badge-status">EARNED</div>
-                `;
-                container.appendChild(badgeDiv);
-            });
-    };
+    // Loop through earned badges
+    badgeList.forEach(badge => {
+        if (earnedIds.includes(badge.id)) {
+            const badgeCard = document.createElement("div");
+            badgeCard.className = "badge-card";
+            badgeCard.innerHTML = `
+                <div class="badge-icon" style="--badge-color: ${badge.color}">${badge.icon}</div>
+                <div class="badge-name">${badge.name}</div>
+                <div class="badge-earned">EARNED</div>
+            `;
+            badgeContainer.appendChild(badgeCard);
+        }
+    });
 
-})();
+    container.appendChild(badgeContainer);
+}
+
+// Export for global use
+window.renderBadges = renderBadges;
