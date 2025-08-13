@@ -1,5 +1,5 @@
 (function() {     
-    // Badge data (edit/add badges here)
+    // Badge data
     const badgeList = [
         { id: "starter", name: "Starter Planter", icon: "fa-seedling", color: "#4CAF50" },
         { id: "eco-hero", name: "Eco Hero", icon: "fa-globe-americas", color: "#2196F3" },
@@ -11,41 +11,6 @@
         { id: "clean-energy", name: "Clean Energy Advocate", icon: "fa-solar-panel", color: "#FFC107" }
     ];
 
-    // Function to render badges
-    window.renderBadges = function(targetSelector, earnedBadges = []) {
-        const container = document.querySelector(targetSelector);
-        if (!container) return;
-        
-        container.innerHTML = "";
-        container.classList.add("badge-container");
-
-        badgeList.forEach(badge => {
-            const badgeDiv = document.createElement("div");
-            badgeDiv.classList.add("badge");
-
-            const isEarned = earnedBadges.includes(badge.id);
-
-            badgeDiv.innerHTML = `
-                <div class="badge-shape" style="background: linear-gradient(135deg, ${badge.color}, ${lightenColor(badge.color, 20)})">
-                    <i class="fas ${badge.icon}"></i>
-                </div>
-                <div class="badge-name">${badge.name}</div>
-                <div class="badge-status ${isEarned ? 'earned' : 'locked'}">
-                    ${isEarned ? 'Earned' : 'Locked'}
-                </div>
-            `;
-
-            if (!isEarned) {
-                badgeDiv.classList.add("locked-badge");
-                badgeDiv.title = "You haven't earned this badge yet!";
-            } else {
-                badgeDiv.title = `You earned this badge on ${new Date().toLocaleDateString()}!`;
-            }
-            
-            container.appendChild(badgeDiv);
-        });
-    };
-    
     // Helper function to lighten colors
     function lightenColor(color, percent) {
         const num = parseInt(color.replace("#", ""), 16),
@@ -60,4 +25,29 @@
             (B < 255 ? (B < 1 ? 0 : B) : 255)
         ).toString(16).slice(1)}`;
     }
+
+    // Function to render badges
+    window.renderBadges = function(targetSelector) {
+        const container = document.querySelector(targetSelector);
+        if (!container) return;
+        
+        container.innerHTML = "";
+        container.classList.add("badge-container");
+
+        badgeList.forEach(badge => {
+            const badgeDiv = document.createElement("div");
+            badgeDiv.classList.add("badge");
+            
+            badgeDiv.innerHTML = `
+                <div class="badge-shape" style="background: linear-gradient(135deg, ${badge.color}, ${lightenColor(badge.color, 20)})">
+                    <i class="fas ${badge.icon}"></i>
+                </div>
+                <div class="badge-name">${badge.name}</div>
+                <div class="badge-status earned">Earned</div>
+            `;
+            
+            badgeDiv.title = `You earned this badge on ${new Date().toLocaleDateString()}!`;
+            container.appendChild(badgeDiv);
+        });
+    };
 })();
