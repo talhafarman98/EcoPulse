@@ -1,53 +1,86 @@
-(function() {     
+(function() {
+
     // Badge data
     const badgeList = [
-        { id: "starter", name: "Starter Planter", icon: "fa-seedling", color: "#4CAF50" },
-        { id: "eco-hero", name: "Eco Hero", icon: "fa-globe-americas", color: "#2196F3" },
-        { id: "forest-guardian", name: "Forest Guardian", icon: "fa-tree", color: "#8BC34A" },
-        { id: "climate-warrior", name: "Climate Warrior", icon: "fa-fire", color: "#FF5722" },
-        { id: "species-saver", name: "Species Saver", icon: "fa-dove", color: "#9C27B0" },
-        { id: "water-protector", name: "Water Protector", icon: "fa-tint", color: "#00BCD4" },
-        { id: "recycling-champ", name: "Recycling Champ", icon: "fa-recycle", color: "#009688" },
-        { id: "clean-energy", name: "Clean Energy Advocate", icon: "fa-solar-panel", color: "#FFC107" }
+        { num: 1, name: "Starter Planter", color: "#4CAF50", icon: "fa-seedling" },
+        { num: 2, name: "Eco Hero", color: "#2196F3", icon: "fa-globe" },
+        { num: 3, name: "Forest Guardian", color: "#8BC34A", icon: "fa-tree" },
+        { num: 4, name: "Climate Warrior", color: "#FF5722", icon: "fa-fire" },
+        { num: 5, name: "Species Saver", color: "#9C27B0", icon: "fa-dove" },
+        { num: 6, name: "Water Protector", color: "#00BCD4", icon: "fa-tint" },
+        { num: 7, name: "Recycling Champ", color: "#009688", icon: "fa-recycle" },
+        { num: 8, name: "Clean Energy Advocate", color: "#FFC107", icon: "fa-solar-panel" }
     ];
 
-    // Helper function to lighten colors
-    function lightenColor(color, percent) {
-        const num = parseInt(color.replace("#", ""), 16),
-            amt = Math.round(2.55 * percent),
-            R = (num >> 16) + amt,
-            G = (num >> 8 & 0x00FF) + amt,
-            B = (num & 0x0000FF) + amt;
-        return `#${(
-            0x1000000 +
-            (R < 255 ? (R < 1 ? 0 : R) : 255) * 0x10000 +
-            (G < 255 ? (G < 1 ? 0 : G) : 255) * 0x100 +
-            (B < 255 ? (B < 1 ? 0 : B) : 255)
-        ).toString(16).slice(1)}`;
-    }
+    // Inject CSS
+    const style = document.createElement('style');
+    style.innerHTML = `
+        .badge-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 20px;
+        }
+        .badge-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0px 4px 20px rgba(0,0,0,0.1);
+            text-align: center;
+            padding: 20px;
+            transition: transform 0.2s ease;
+        }
+        .badge-card:hover {
+            transform: translateY(-5px);
+        }
+        .badge-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 28px;
+            margin: auto;
+            margin-bottom: 15px;
+        }
+        .badge-name {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .badge-status {
+            font-size: 12px;
+            font-weight: 600;
+            color: #4CAF50;
+            background: #E6F5EC;
+            padding: 4px 10px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+    `;
+    document.head.appendChild(style);
 
-    // Function to render badges
-    window.renderBadges = function(targetSelector) {
+    // Render function
+    window.renderBadges = function(targetSelector, badgeNumbers) {
         const container = document.querySelector(targetSelector);
         if (!container) return;
-        
         container.innerHTML = "";
-        container.classList.add("badge-container");
+        container.classList.add("badge-grid");
 
-        badgeList.forEach(badge => {
-            const badgeDiv = document.createElement("div");
-            badgeDiv.classList.add("badge");
-            
-            badgeDiv.innerHTML = `
-                <div class="badge-shape" style="background: linear-gradient(135deg, ${badge.color}, ${lightenColor(badge.color, 20)})">
-                    <i class="fas ${badge.icon}"></i>
-                </div>
-                <div class="badge-name">${badge.name}</div>
-                <div class="badge-status earned">Earned</div>
-            `;
-            
-            badgeDiv.title = `You earned this badge on ${new Date().toLocaleDateString()}!`;
-            container.appendChild(badgeDiv);
-        });
+        badgeList
+            .filter(b => badgeNumbers.includes(b.num))
+            .forEach(badge => {
+                const badgeDiv = document.createElement("div");
+                badgeDiv.className = "badge-card";
+                badgeDiv.innerHTML = `
+                    <div class="badge-icon" style="background:${badge.color}">
+                        <i class="fas ${badge.icon}"></i>
+                    </div>
+                    <div class="badge-name">${badge.name}</div>
+                    <div class="badge-status">EARNED</div>
+                `;
+                container.appendChild(badgeDiv);
+            });
     };
+
 })();
