@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>EcoPulse Certificate</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+  body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #eee;
+    height: 100vh;
+    margin: 0;
+    padding-top: 20px;
+    font-family: Arial, sans-serif;
+  }
+  .certificate {
+    position: relative;
+    width: 989px; /* match image width */
+  }
+  .certificate img {
+    width: 100%;
+    display: block;
+  }
+  .name {
+    position: absolute;
+    top: 44%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Georgia', serif;
+    font-weight: bold;
+    font-size: 38px;
+    color: #2e3b1d;
+    text-align: center;
+    white-space: nowrap;
+  }
+  .trees {
+    position: absolute;
+    top: 60%;
+    left: 26%;
+    transform: translate(-50%, -50%);
+    font-family: 'Georgia', serif;
+    font-weight: bold;
+    font-size: 18px;
+    color: #000;
+    text-align: center;
+    white-space: nowrap;
+  }
+  .inputs {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+  }
+  .inputs input {
+    padding: 10px;
+    font-size: 16px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    outline: none;
+    width: 220px;
+  }
+  .inputs input:focus {
+    border-color: #2e3b1d;
+  }
+  button {
+    margin-top: 15px;
+    padding: 10px 20px;
+    font-size: 16px;
+    background: #2e3b1d;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  button:hover {
+    background: #3f5130;
+  }
+</style>
+</head>
+<body>
+
+<div class="certificate" id="certificate">
+  <img src="certificate.png" alt="Certificate">
+  <div class="name" id="certName"></div>
+  <div class="trees" id="treeCount">1000</div>
+</div>
+
+<div class="inputs">
+  <input type="text" id="nameInput" placeholder="Enter Name" value="">
+  <input type="number" id="treesInput" placeholder="Trees Planted" value="1000">
+</div>
+
+<button onclick="downloadCertificate()">Download Certificate</button>
+
+<script>
+  const nameInput = document.getElementById("nameInput");
+  const treesInput = document.getElementById("treesInput");
+  const certName = document.getElementById("certName");
+  const treeCount = document.getElementById("treeCount");
+
+  // Update certificate live when typing
+  nameInput.addEventListener("input", () => {
+    certName.innerText = nameInput.value || " ";
+  });
+
+  treesInput.addEventListener("input", () => {
+    treeCount.innerText = treesInput.value || " ";
+  });
+
+  function downloadCertificate() {
+    html2canvas(document.getElementById("certificate"), { scale: 3 }).then(canvas => {
+      let link = document.createElement("a");
+      link.download = (nameInput.value || "Certificate").replace(/\s+/g, "_") + "_Certificate.png";
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    });
+  }
+</script>
+
+</body>
+</html>

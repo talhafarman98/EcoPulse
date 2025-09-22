@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>EcoPulse Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+    
+    .animate-fade-in {
+      animation: fadeIn 0.5s ease-out forwards;
+    }
+    
+    .animate-pulse-once {
+      animation: pulse 0.5s ease-in-out;
+    }
+    
+    .badge-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px -5px rgba(46, 125, 50, 0.3);
+    }
+    
+    .stat-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 15px -3px rgba(46, 125, 50, 0.2);
+    }
+    
+    .transition-all {
+      transition: all 0.3s ease;
+    }
+    
+    .scrollbar-hide::-webkit-scrollbar {
+      display: none;
+    }
+    
+    .scrollbar-hide {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    
+    .bg-gradient-eco {
+      background: linear-gradient(135deg, #f0fff4 0%, #e6ffed 100%);
+    }
+    
+    .ring-success {
+      box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.5);
+    }
+  </style>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'eco-green': {
+              50: '#f0fff4',
+              100: '#dcffe4',
+              200: '#bef5cb',
+              300: '#85e89d',
+              400: '#34d058',
+              500: '#28a745',
+              600: '#22863a',
+              700: '#176f2c',
+              800: '#165c26',
+              900: '#144620',
+            },
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-gradient-eco font-sans min-h-screen flex flex-col text-gray-800">
+  <!-- Header -->
+  <header class="bg-eco-green-600 text-white shadow-lg">
+    <div class="container mx-auto px-4 py-4 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-eco-green-600">
+          <i class="fas fa-leaf text-xl"></i>
+        </div>
+        <h1 class="text-xl font-bold">EcoPulse Dashboard</h1>
+      </div>
+      
+      <div class="flex items-center space-x-4">
+        <div class="relative">
+          <button id="notifBtn" class="w-10 h-10 rounded-full bg-eco-green-500 hover:bg-eco-green-700 flex items-center justify-center text-white transition-all relative">
+            <i class="fas fa-bell"></i>
+            <span id="notifCount" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center hidden">0</span>
+          </button>
+          <div id="notifDropdown" class="absolute right-0 mt-2 w-72 bg-white rounded-lg shadow-xl z-50 overflow-hidden hidden transform transition-all duration-300 origin-top-right scale-95 opacity-0">
+            <div class="max-h-96 overflow-y-auto scrollbar-hide">
+              <div class="px-4 py-3 border-b border-gray-100 bg-eco-green-50">
+                <h3 class="font-semibold text-eco-green-800">Notifications</h3>
+              </div>
+              <div id="notifItems" class="divide-y divide-gray-100">
+                <div class="px-4 py-3 text-sm text-gray-700">No notifications yet</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <button id="logoutBtn" class="w-10 h-10 rounded-full bg-eco-green-500 hover:bg-eco-green-700 flex items-center justify-center text-white transition-all">
+          <i class="fas fa-sign-out-alt"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex-1 container mx-auto px-4 py-8">
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div class="stat-card bg-white rounded-xl shadow-md p-6 transition-all hover:shadow-lg animate-fade-in" style="animation-delay: 0.1s">
+        <div class="flex items-center space-x-4">
+          <div class="w-14 h-14 rounded-full bg-eco-green-100 flex items-center justify-center text-eco-green-600">
+            <i class="fas fa-tree text-2xl"></i>
+          </div>
+          <div>
+            <p class="text-gray-500 text-sm font-medium">Trees Planted</p>
+            <h3 id="totalTrees" class="text-3xl font-bold text-eco-green-600">0</h3>
+          </div>
+        </div>
+        <div class="mt-4 pt-4 border-t border-gray-100">
+          <p class="text-xs text-gray-500">+0 today</p>
+        </div>
+      </div>
+      
+      <div class="stat-card bg-white rounded-xl shadow-md p-6 transition-all hover:shadow-lg animate-fade-in" style="animation-delay: 0.2s">
+        <div class="flex items-center space-x-4">
+          <div class="w-14 h-14 rounded-full bg-eco-green-100 flex items-center justify-center text-eco-green-600">
+            <i class="fas fa-cloud text-2xl"></i>
+          </div>
+          <div>
+            <p class="text-gray-500 text-sm font-medium">CO₂ Saved</p>
+            <h3 id="co2Saved" class="text-3xl font-bold text-eco-green-600">0</h3>
+          </div>
+        </div>
+        <div class="mt-4 pt-4 border-t border-gray-100">
+          <p class="text-xs text-gray-500">kg saved</p>
+        </div>
+      </div>
+      
+      <div class="stat-card bg-white rounded-xl shadow-md p-6 transition-all hover:shadow-lg animate-fade-in" style="animation-delay: 0.3s">
+        <div class="flex items-center space-x-4">
+          <div class="w-14 h-14 rounded-full bg-eco-green-100 flex items-center justify-center text-eco-green-600">
+            <i class="fas fa-seedling text-2xl"></i>
+          </div>
+          <div>
+            <p class="text-gray-500 text-sm font-medium">Species Planted</p>
+            <h3 id="speciesCount" class="text-3xl font-bold text-eco-green-600">0</h3>
+          </div>
+        </div>
+        <div class="mt-4 pt-4 border-t border-gray-100">
+          <p class="text-xs text-gray-500">unique species</p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Certificate Button -->
+    <button id="generateCertBtn" class="hidden mb-8 px-6 py-3 bg-eco-green-500 hover:bg-eco-green-600 text-white font-medium rounded-lg shadow-md transition-all transform hover:scale-105 flex items-center space-x-2">
+      <i class="fas fa-certificate"></i>
+      <span>Generate Certificate</span>
+    </button>
+    
+    <!-- Badges Section -->
+    <div class="mb-10 animate-fade-in" style="animation-delay: 0.4s">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-bold text-gray-800 flex items-center">
+          <i class="fas fa-trophy mr-2 text-eco-green-600"></i>
+          Your Badges
+        </h2>
+        <span id="badgeCount" class="px-3 py-1 bg-eco-green-100 text-eco-green-800 text-sm font-medium rounded-full">0/4</span>
+      </div>
+      
+      <div id="badgesContainer" class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <!-- Badges will be inserted here by JavaScript -->
+      </div>
+    </div>
+    
+    <!-- Planting Records Section -->
+    <div class="animate-fade-in" style="animation-delay: 0.5s">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-bold text-gray-800 flex items-center">
+          <i class="fas fa-list-check mr-2 text-eco-green-600"></i>
+          Planting Records
+        </h2>
+        <span id="recordCount" class="px-3 py-1 bg-eco-green-100 text-eco-green-800 text-sm font-medium rounded-full">0 records</span>
+      </div>
+      
+      <div class="bg-white rounded-xl shadow-md overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-eco-green-50">
+              <tr>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-eco-green-800 uppercase tracking-wider">Name</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-eco-green-800 uppercase tracking-wider">Type</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-eco-green-800 uppercase tracking-wider">Quantity</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-eco-green-800 uppercase tracking-wider">Location</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-eco-green-800 uppercase tracking-wider">Picture</th>
+              </tr>
+            </thead>
+            <tbody id="plantRecordsBody" class="bg-white divide-y divide-gray-200">
+              <tr>
+                <td colspan="5" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">No plants added yet.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Floating Action Button -->
+  <button id="openModal" class="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-eco-green-500 hover:bg-eco-green-600 text-white shadow-lg flex items-center justify-center text-2xl transition-all transform hover:scale-110 ring-4 ring-eco-green-200 animate-pulse-once">
+    <i class="fas fa-plus"></i>
+  </button>
+
+  <!-- Add Plant Modal -->
+  <div id="plantModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black bg-opacity-50">
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-md transform transition-all duration-300 scale-95 opacity-0">
+      <div class="p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-xl font-bold text-gray-800">
+            <i class="fas fa-plus-circle text-eco-green-600 mr-2"></i>
+            Add a Plant
+          </h2>
+          <button id="closeModal" class="text-gray-400 hover:text-gray-500">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        
+        <form id="addPlantForm" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Plant Name *</label>
+            <input type="text" name="plantName" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-eco-green-500 focus:border-eco-green-500 transition-all">
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Type / Species *</label>
+            <input type="text" name="plantType" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-eco-green-500 focus:border-eco-green-500 transition-all">
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Quantity *</label>
+            <input type="number" name="plantQuantity" min="1" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-eco-green-500 focus:border-eco-green-500 transition-all">
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Exact Location *</label>
+            <textarea name="plantLocation" required rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-eco-green-500 focus:border-eco-green-500 transition-all"></textarea>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Picture</label>
+            <div class="flex items-center space-x-4">
+              <label class="flex-1 cursor-pointer">
+                <div class="px-3 py-2 border border-gray-300 rounded-md bg-white hover:bg-gray-50 transition-all text-center">
+                  <span class="text-sm text-gray-600">Choose Image</span>
+                  <input type="file" name="plantPicture" accept="image/*" class="hidden">
+                </div>
+              </label>
+              <div id="imagePreviewContainer" class="w-16 h-16 rounded-md border border-gray-300 overflow-hidden hidden">
+                <img id="imagePreview" class="w-full h-full object-cover">
+              </div>
+            </div>
+          </div>
+          
+          <button type="submit" class="w-full mt-6 px-4 py-2 bg-eco-green-500 hover:bg-eco-green-600 text-white font-medium rounded-md shadow transition-all transform hover:scale-[1.02] flex items-center justify-center space-x-2">
+            <i class="fas fa-check"></i>
+            <span>Add Plant</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-eco-green-600 text-white py-4">
+    <div class="container mx-auto px-4 text-center text-sm">
+      <p>&copy; 2025 EcoPulse. All rights reserved.</p>
+      <div class="flex justify-center space-x-4 mt-2">
+        <a href="#" class="hover:text-eco-green-200 transition-all"><i class="fab fa-twitter"></i></a>
+        <a href="#" class="hover:text-eco-green-200 transition-all"><i class="fab fa-instagram"></i></a>
+        <a href="#" class="hover:text-eco-green-200 transition-all"><i class="fab fa-facebook"></i></a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Your existing script (unchanged) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc, collection, addDoc, getDocs, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const res = await fetch('./firebase.json');
+    const firebaseConfig = await res.json();
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    let user = null, userDocRef = null;
+    const CO2_PER_TREE_KG = 21.77;
+    const badgeMilestones = [
+      { id:'seedling', name:'Seedling (10 plants)', icon:'seedling', minPlants:10 },
+      { id:'sprout', name:'Sprout (50 plants)', icon:'leaf', minPlants:50 },
+      { id:'treeGuardian', name:'Tree Guardian (100 plants)', icon:'tree', minPlants:100 },
+      { id:'forestHero', name:'Forest Hero (250 plants)', icon:'mountain', minPlants:250 }
+    ];
+
+    const totalTreesEl = document.getElementById('totalTrees');
+    const co2SavedEl = document.getElementById('co2Saved');
+    const speciesCountEl = document.getElementById('speciesCount');
+    const badgesContainer = document.getElementById('badgesContainer');
+    const plantRecordsBody = document.getElementById('plantRecordsBody');
+    const notifDropdown = document.getElementById('notifDropdown');
+    const notifItems = document.getElementById('notifItems');
+    const notifCount = document.getElementById('notifCount');
+    const generateCertBtn = document.getElementById('generateCertBtn');
+    const badgeCount = document.getElementById('badgeCount');
+    const recordCount = document.getElementById('recordCount');
+
+    const plantModal = document.getElementById('plantModal');
+    const openModal = document.getElementById('openModal');
+    const closeModal = document.getElementById('closeModal');
+    const addPlantForm = document.getElementById('addPlantForm');
+    const imagePreview = document.getElementById('imagePreview');
+    const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+
+    // Modal handling
+    function toggleModal(show) {
+      if (show) {
+        plantModal.classList.remove('hidden');
+        setTimeout(() => {
+          plantModal.querySelector('div').classList.remove('scale-95', 'opacity-0');
+          plantModal.querySelector('div').classList.add('scale-100', 'opacity-100');
+        }, 10);
+      } else {
+        plantModal.querySelector('div').classList.remove('scale-100', 'opacity-100');
+        plantModal.querySelector('div').classList.add('scale-95', 'opacity-0');
+        setTimeout(() => {
+          plantModal.classList.add('hidden');
+        }, 300);
+      }
+    }
+
+    openModal.onclick = () => toggleModal(true);
+    closeModal.onclick = () => toggleModal(false);
+    plantModal.onclick = (e) => {
+      if (e.target === plantModal) toggleModal(false);
+    };
+
+    // Notification dropdown
+    document.getElementById('notifBtn').onclick = (e) => {
+      e.stopPropagation();
+      notifDropdown.classList.toggle('hidden');
+      notifDropdown.classList.toggle('scale-95');
+      notifDropdown.classList.toggle('opacity-0');
+      notifDropdown.classList.toggle('scale-100');
+      notifDropdown.classList.toggle('opacity-100');
+    };
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!notifBtn.contains(e.target) && !notifDropdown.contains(e.target)) {
+        notifDropdown.classList.add('hidden', 'scale-95', 'opacity-0');
+        notifDropdown.classList.remove('scale-100', 'opacity-100');
+      }
+    });
+
+    document.getElementById('logoutBtn').onclick = () => signOut(auth).then(()=>location.href='index.html');
+
+    addPlantForm.plantPicture.onchange = e => {
+      const file = e.target.files[0];
+      if(file){
+        const reader = new FileReader();
+        reader.onload = () => { 
+          imagePreview.src = reader.result; 
+          imagePreviewContainer.classList.remove('hidden');
+        };
+        reader.readAsDataURL(file);
+      }
+    };
+
+    generateCertBtn.onclick = () => {
+      window.location.href = "certificate.html";
+    };
+
+    onAuthStateChanged(auth, async firebaseUser => {
+      if(!firebaseUser) return location.href='index.html';
+      user = firebaseUser;
+      userDocRef = doc(db,'users',user.uid);
+      if(!(await getDoc(userDocRef)).exists()) {
+        await setDoc(userDocRef,{ plantsPlanted:0, speciesPlanted:0, badges:[] });
+      }
+      loadUserData();
+    });
+
+    async function loadUserData(){
+      const data = (await getDoc(userDocRef)).data();
+      const plantingRecords = await getUserPlantingRecords();
+      const speciesCount = new Set(plantingRecords.map(r=>r.type.toLowerCase())).size;
+      totalTreesEl.textContent = data.plantsPlanted || 0;
+      speciesCountEl.textContent = speciesCount;
+      co2SavedEl.textContent = ((data.plantsPlanted||0)*CO2_PER_TREE_KG).toFixed(2);
+      renderBadges(data.badges || []);
+      renderRecords(plantingRecords);
+      recordCount.textContent = `${plantingRecords.length} records`;
+
+      if(data.plantsPlanted > 1000){
+        generateCertBtn.classList.remove('hidden');
+      }
+    }
+
+    async function getUserPlantingRecords(){
+      return (await getDocs(collection(db,'users',user.uid,'plantingRecords')))
+             .docs.map(doc=>({id:doc.id,...doc.data()}));
+    }
+
+    function renderBadges(userBadges){
+      badgesContainer.innerHTML = '';
+      badgeMilestones.forEach(b=>{
+        const earned = userBadges.includes(b.id);
+        const card = document.createElement('div');
+        card.className = `badge-card bg-white rounded-xl shadow-md p-4 text-center transition-all ${earned ? 'ring-success' : 'opacity-60'}`;
+        card.innerHTML = `
+          <div class="w-16 h-16 mx-auto rounded-full ${earned ? 'bg-eco-green-100 text-eco-green-600' : 'bg-gray-100 text-gray-400'} flex items-center justify-center text-3xl mb-3">
+            <i class="fas fa-${b.icon}"></i>
+          </div>
+          <h3 class="font-semibold ${earned ? 'text-eco-green-700' : 'text-gray-500'}">${b.name}</h3>
+          <p class="text-xs mt-1 ${earned ? 'text-eco-green-500' : 'text-gray-400'}">${earned ? 'Earned!' : 'Not earned yet'}</p>
+        `;
+        badgesContainer.appendChild(card);
+      });
+      
+      // Update badge count
+      const earnedCount = userBadges.length;
+      badgeCount.textContent = `${earnedCount}/${badgeMilestones.length}`;
+      badgeCount.className = `px-3 py-1 ${earnedCount === badgeMilestones.length ? 'bg-eco-green-100 text-eco-green-800' : 'bg-amber-100 text-amber-800'} text-sm font-medium rounded-full`;
+    }
+
+    function renderRecords(records){
+      if(!records.length){
+        plantRecordsBody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">No plants added yet.</td></tr>';
+        return;
+      }
+      plantRecordsBody.innerHTML = '';
+      records.forEach(r=>{
+        const row = document.createElement('tr');
+        row.className = 'hover:bg-gray-50 transition-all';
+        row.innerHTML = `
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="text-sm font-medium text-gray-900">${escapeHtml(r.name)}</div>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="text-sm text-gray-500">${escapeHtml(r.type)}</div>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-eco-green-100 text-eco-green-800">
+              ${r.quantity}
+            </span>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${escapeHtml(r.location)}</td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            ${r.imageBase64 ? `<img src="${r.imageBase64}" class="w-12 h-12 rounded-md object-cover border border-gray-200">` : '<span class="text-gray-400 text-sm">No image</span>'}
+          </td>
+        `;
+        plantRecordsBody.appendChild(row);
+      });
+    }
+
+    function escapeHtml(t){return t.replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+
+    addPlantForm.onsubmit = async e => {
+      e.preventDefault();
+      const f = e.target;
+      const name = f.plantName.value.trim();
+      const type = f.plantType.value.trim();
+      const qty = parseInt(f.plantQuantity.value,10);
+      const loc = f.plantLocation.value.trim();
+      let img64 = '';
+      if(f.plantPicture.files[0]) img64 = await fileToBase64(f.plantPicture.files[0]);
+      await addDoc(collection(db,'users',user.uid,'plantingRecords'),{
+        name,type,quantity:qty,location:loc,imageBase64:img64
+      });
+      await updateDoc(userDocRef,{ plantsPlanted: increment(qty) });
+      await checkBadges();
+      toggleModal(false);
+      f.reset();
+      imagePreviewContainer.classList.add('hidden');
+      loadUserData();
+    };
+
+    function fileToBase64(file){
+      return new Promise((res,rej)=>{
+        const r=new FileReader();
+        r.onload=()=>res(r.result);
+        r.onerror=rej;
+        r.readAsDataURL(file);
+      });
+    }
+
+    async function checkBadges(){
+      const data = (await getDoc(userDocRef)).data();
+      const earned = data.badges || [];
+      const newOnes = badgeMilestones.filter(b=>data.plantsPlanted>=b.minPlants && !earned.includes(b.id)).map(b=>b.id);
+      if(newOnes.length){
+        await updateDoc(userDocRef,{ badges:[...earned,...newOnes] });
+        newOnes.forEach(id=>{
+          const badge = badgeMilestones.find(b=>b.id===id);
+          
+          // Create notification
+          const notif = document.createElement('div');
+          notif.className = 'px-4 py-3 border-b border-gray-100 last:border-b-0 hover:bg-gray-50 transition-all';
+          notif.innerHTML = `
+            <div class="flex items-start space-x-3">
+              <div class="flex-shrink-0 mt-0.5">
+                <div class="w-8 h-8 rounded-full bg-eco-green-100 text-eco-green-600 flex items-center justify-center">
+                  <i class="fas fa-trophy text-sm"></i>
+                </div>
+              </div>
+              <div class="flex-1">
+                <p class="text-sm font-medium text-gray-800">New badge earned!</p>
+                <p class="text-xs text-gray-500">${badge.name}</p>
+              </div>
+              <div class="text-xs text-gray-400">Just now</div>
+            </div>
+          `;
+          
+          // Add to top of notifications
+          if (notifItems.firstChild) {
+            notifItems.insertBefore(notif, notifItems.firstChild);
+          } else {
+            notifItems.appendChild(notif);
+          }
+          
+          // Update notification count
+          const currentCount = parseInt(notifCount.textContent) || 0;
+          notifCount.textContent = currentCount + 1;
+          notifCount.classList.remove('hidden');
+        });
+        
+        // Show notification dropdown if not already visible
+        if (!notifDropdown.classList.contains('hidden')) {
+          notifDropdown.classList.remove('hidden', 'scale-95', 'opacity-0');
+          notifDropdown.classList.add('scale-100', 'opacity-100');
+        }
+      }
+    }
+  </script>
+</body>
+</html>
